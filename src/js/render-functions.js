@@ -22,6 +22,7 @@ export function createMarkup(array) {
                 src="${webformatURL}"
                 alt="${tags}"
                 width="360"
+                height="200"
               />
               <ul class="gallery-card-list">
                 <li>

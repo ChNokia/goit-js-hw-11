@@ -17,15 +17,14 @@ let searchParams = new URLSearchParams ({
 });
 
 const form = document.querySelector(".form");
-const loading = document.querySelector(".loader");
+const loading = document.querySelector(".loading-container");
 const gallery = document.querySelector(".gallery");
-const itemOption = {
+const galleryLightbox = new SimpleLightbox('.gallery a', {
     captionDelay: 250,
     captionType: 'attr',
     captionsData: 'alt',
     captionPosition: 'bottom'
-}
-const galleryLightbox = new SimpleLightbox('.gallery a', itemOption);
+});
 
 form.addEventListener("submit", handleSubmit);
 
@@ -33,21 +32,36 @@ function handleSubmit(event) {
     event.preventDefault();
 
     searchParams.set("q", event.target.elements.search.value);
-    loading.hidden = false;
+    fillInGallery([]);
+    showLoading();
 
     fetchData(`${BASE_URL}?${searchParams}`)
         .then(result => {
             if (!result.hits.length) {
-                gallery.innerHTML = "";
+                fillInGallery([]);
                 showToastError("Sorry, there are no images matching your search query. Please try again!");
                 return;
             }
 
-            gallery.insertAdjacentHTML("afterbegin", createMarkup(result.hits));
-            galleryLightbox.refresh();
+            fillInGallery(result.hits);
         })
         .catch(error => showToastError(error.message))
-        .finally(() => loading.hidden = true)
+        .finally(() => {
+            hideLoading();
+        })
     
     form.reset();
+}
+
+function fillInGallery(array) {
+    gallery.innerHTML = createMarkup(array);
+    galleryLightbox.refresh();
+}
+
+function showLoading() {
+    loading.style.display = "flex";
+}
+
+function hideLoading() {
+    loading.style.display = "none";
 }
